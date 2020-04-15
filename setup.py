@@ -21,7 +21,7 @@ setup(
     version=pylibrespot_java.__version__,
     url="http://github.com/uvjustin/pylibrespot-java/",
     author="Justin Wong",
-    install_requires=[],
+    install_requires=['aiohttp'],
     author_email="46082645+uvjustin@users.noreply.github.com",
     description="Python Interface for librespot-java",
     long_description=LONG_DESCRIPTION,
