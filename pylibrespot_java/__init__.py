@@ -1,13 +1,17 @@
 """This library wraps the librespot-java API for use with Home Assistant."""
-__version__ = "0.1.0"
+from __future__ import annotations
+
+__version__ = "0.1.1"
 import asyncio
 import logging
+from typing import Any, Callable, Coroutine, Mapping
+
 import aiohttp
 
 _LOGGER = logging.getLogger(__name__)
 
 
-def _debug_string(string_base, status) -> str:
+def _debug_string(string_base: str, status: int) -> str:
     """Helper for logger debug strings."""
     if status == 204:
         return string_base + " No active session"
@@ -21,12 +25,16 @@ def _debug_string(string_base, status) -> str:
 class LibrespotJavaAPI:
     """Class for interfacing with librespot-java API."""
 
-    def __init__(self, websession, ip_address, api_port):
+    def __init__(
+        self, websession: aiohttp.ClientSession, ip_address: str, api_port: int
+    ):
         self._ip_address = ip_address
         self._api_port = api_port
         self._websession = websession
 
-    async def post_request(self, endpoint, data=None) -> int:
+    async def post_request(
+        self, endpoint: str, data: Mapping[str, Any] | None = None
+    ) -> aiohttp.ClientResponse:
         """Helper function to put to endpoint."""
         url = f"http://{self._ip_address}:{self._api_port}/{endpoint}"
         _LOGGER.debug("POST request to %s with payload %s.", url, data)
@@ -34,7 +42,9 @@ class LibrespotJavaAPI:
         return response
 
     async def start_websocket_handler(
-        self, update_callback, websocket_reconnect_time,
+        self,
+        update_callback: Callable[[Mapping[str, Any]], Coroutine[Any, Any, None]],
+        websocket_reconnect_time: float,
     ) -> None:
         """Websocket handler daemon."""
         _LOGGER.debug("Starting websocket handler")
@@ -60,7 +70,7 @@ class LibrespotJavaAPI:
                 await asyncio.sleep(websocket_reconnect_time)
                 continue
 
-    async def player_load(self, uri, play) -> int:
+    async def player_load(self, uri: str, play: bool) -> int:
         """Load track from URI."""
         resp = await self.post_request(
             endpoint="player/load", data={"uri": uri, "play": play}
@@ -164,48 +174,3 @@ class LibrespotJavaAPI:
             )
         json = await resp.json(content_type=None)
         return json
-
-
-class LibrespotJavaData:
-    """Represent a librespot-java server."""
-
-    def __init__(self):
-        """Initialize the LibrespotJava class."""
-        self._player_status = None
-        self._volume = None
-        self._track_info = None
-
-    @property
-    def name(self):
-        """Name getter."""
-        return "librespot-java"
-
-    @property
-    def player_status(self):
-        """Player status getter."""
-        return self._player_status
-
-    @player_status.setter
-    def player_status(self, value):
-        """Player status setter."""
-        self._player_status = value
-
-    @property
-    def volume(self):
-        """Volume getter."""
-        return self._volume
-
-    @volume.setter
-    def volume(self, value):
-        """Volume setter."""
-        self._volume = value
-
-    @property
-    def track_info(self):
-        """Track info getter."""
-        return self._track_info
-
-    @track_info.setter
-    def track_info(self, value):
-        """Track info setter."""
-        self._track_info = value

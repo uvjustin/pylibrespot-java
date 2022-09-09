@@ -26,6 +26,8 @@ setup(
     description="Python Interface for librespot-java",
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
+    package_data={"pyforked_daapd": ["py.typed"]},
+    zip_safe=False,
     packages=["pylibrespot_java"],
     include_package_data=True,
     platforms="any",

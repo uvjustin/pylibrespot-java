@@ -1,2 +1,4 @@
 v0.1.0, 2020-04-15 -- Initial release.
-
+v0.1.1, 2022-09-09 -- Remove LibrespotJavaData
+                      Fix typing
+                      Add py.typed
